@@ -1,5 +1,5 @@
 class Car extends Thread {
-   
+
     protected int id;
     protected int capacity;
     protected int passengers;
@@ -10,16 +10,16 @@ class Car extends Thread {
 
         try {
             while(true) {
-                Thread.sleep(1*1000);
+            	Thread.sleep(3000);
                 if(!notFull()) {
                     setStatus("run");
-                    Thread.sleep(10*1000);    //10 secs
+                    Thread.sleep(3*1000);    //10 secs
                     setStatus("unload");
-                    
+
                     while(passengers > 0) {
                         //wait for passengers to unboard
                     }
-                    
+
                     break;
                 }
             }
@@ -33,7 +33,7 @@ class Car extends Thread {
         this.id = id;
         this.capacity = capacity;
         this.passengers = 0;
-        
+
         if(id == 0) {
             setStatus("load");
         }
@@ -59,7 +59,7 @@ class Car extends Thread {
     public boolean notFull() {
         return passengers < capacity;
     }
-    
+
     public void loadPassenger() {
         passengers++;
     }
