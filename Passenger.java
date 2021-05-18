@@ -45,36 +45,54 @@ class Passenger extends Thread {
      * board car
      */
     private void board() {
-        Car car = cars.peek();
-        if(car.getStatus().equalsIgnoreCase("load") && car.notFull()) {
-            riding = car.carId();
-            car.loadPassenger();
-            System.out.println("Passenger " + id + " boarded Car " + riding + ".");
+        try {
+            Car car = cars.peek();
+            if(car.getStatus().equalsIgnoreCase("load") && car.notFull()) {
+                riding = car.carId();
+                car.loadPassenger();
+                System.out.println("Passenger " + id + " boarded Car " + riding + ".");
 
-            if(!car.notFull()) {
-                doneCars.add(cars.remove());
-                cars.peek().setStatus("load");
+                if(!car.notFull()) {
+                    Thread.sleep(1*1000);   //sync to Car run
+                    doneCars.add(cars.remove());
+                    cars.peek().setStatus("load");
+                }
             }
+            Thread.sleep(10*1000);
+        }
+        catch(Exception e) {
+            e.printStackTrace();
         }
     }
 
     private void unboard() {
-        if(doneCars.peek() != null) {
-            Car car = doneCars.peek();
-            while(!car.getStatus().equalsIgnoreCase("unload")) {
-                //
-            }
+        try {
+            while(true) {
+                Car car = doneCars.peek();
+                if(car != null && riding != -1) {
+                    
+                    while(!car.getStatus().equalsIgnoreCase("unload")) {
+                        //
+                    }
 
-            if(car.carId() == riding) {
-                car.unloadPassenger();
-                System.out.println("Passenger " + id + " unboarded Car " + car.carId() + ".");
-                riding = -1;
-                
+                    if(car.carId() == riding) {
+                        car.unloadPassenger();
+                        System.out.println("Passenger " + id + " unboarded Car " + car.carId() + ".");
+                        riding = -1;
+                        
 
-                if(car.getPassenger() == 0)
-                    doneCars.remove();
-                
+                        if(car.getPassenger() == 0)
+                            doneCars.remove();
+                        
+                    }
+                    if(riding == -1) {
+                        break;
+                    }
+                }
             }
+        }
+        catch(Exception e) {
+            e.printStackTrace();
         }
     }
 }

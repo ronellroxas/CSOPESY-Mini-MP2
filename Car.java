@@ -10,10 +10,16 @@ class Car extends Thread {
 
         try {
             while(true) {
+                Thread.sleep(1*1000);
                 if(!notFull()) {
                     setStatus("run");
                     Thread.sleep(10*1000);    //10 secs
                     setStatus("unload");
+                    
+                    while(passengers > 0) {
+                        //wait for passengers to unboard
+                    }
+                    
                     break;
                 }
             }
