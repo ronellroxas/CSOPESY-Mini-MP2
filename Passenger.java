@@ -47,20 +47,22 @@ class Passenger extends Thread {
      */
     private void board() {
         try {
+            mutex.acquire();
             Car car = cars.peek();
             if (car.getStatus().equalsIgnoreCase("load") && car.notFull()) {
                 riding = car.carId();
                 car.loadPassenger();
-                mutex.acquire();
                 System.out.println("Passenger " + id + " boarded Car " + riding + ".");
 
                 if (!car.notFull()) {
                     Thread.sleep(1 * 1000); // sync to Car run
                     doneCars.add(cars.remove());
-                    cars.peek().setStatus("load");
+                    if(cars.peek() != null) //if not last car
+                        cars.peek().setStatus("load");
                 }
             }
-            Thread.sleep(10 * 1000);
+            mutex.release();
+            Thread.sleep(10*1000);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -68,6 +70,7 @@ class Passenger extends Thread {
 
     private void unboard() {
         try {
+            mutex.acquire();
             while (true) {
                 Car car = doneCars.peek();
                 if (car != null && riding != -1) {
@@ -78,14 +81,16 @@ class Passenger extends Thread {
 
                     if (car.carId() == riding) {
                         car.unloadPassenger();
-                        mutex.release();
                         System.out.println("Passenger " + id + " unboarded Car " + car.carId() + ".");
                         riding = -1;
 
                         if (car.getPassenger() == 0)
                             doneCars.remove();
-
+                        
+                        mutex.release();
+                        break;
                     }
+            
                     if (riding == -1) {
                         break;
                     }
