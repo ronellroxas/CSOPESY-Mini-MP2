@@ -8,7 +8,8 @@ class Passenger extends Thread {
     protected Queue<Car> doneCars; // kachow
     private int riding;
     private Random rand = new Random();
-    private Semaphore mutex = new Semaphore(1);
+    private Semaphore mutex1 = new Semaphore(1);
+    private Semaphore mutex2 = new Semaphore(1);
 
     @Override
     public void run() {
@@ -47,9 +48,9 @@ class Passenger extends Thread {
      */
     private void board() {
         try {
-            mutex.acquire();
+            mutex1.acquire();
             Car car = cars.peek();
-            if (car.getStatus().equalsIgnoreCase("load") && car.notFull()) {
+            if (car.getStatus().equalsIgnoreCase("load") && car.notFull() && car != null) {
                 riding = car.carId();
                 car.loadPassenger();
                 System.out.println("Passenger " + id + " boarded Car " + riding + ".");
@@ -57,12 +58,12 @@ class Passenger extends Thread {
                 if (!car.notFull()) {
                     Thread.sleep(1 * 1000); // sync to Car run
                     doneCars.add(cars.remove());
-                    if(cars.peek() != null) //if not last car
+                    if (cars.peek() != null) // if not last car
                         cars.peek().setStatus("load");
                 }
             }
-            mutex.release();
-            Thread.sleep(10*1000);
+            mutex1.release();
+            Thread.sleep(10 * 1000);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -70,13 +71,14 @@ class Passenger extends Thread {
 
     private void unboard() {
         try {
-            mutex.acquire();
+            mutex2.acquire();
             while (true) {
                 Car car = doneCars.peek();
                 if (car != null && riding != -1) {
 
                     while (!car.getStatus().equalsIgnoreCase("unload")) {
                         //
+                        Thread.sleep(50);
                     }
 
                     if (car.carId() == riding) {
@@ -86,16 +88,15 @@ class Passenger extends Thread {
 
                         if (car.getPassenger() == 0)
                             doneCars.remove();
-                        
-                        mutex.release();
                         break;
                     }
-            
+
                     if (riding == -1) {
                         break;
                     }
                 }
             }
+            mutex2.release();
         } catch (Exception e) {
             e.printStackTrace();
         }
