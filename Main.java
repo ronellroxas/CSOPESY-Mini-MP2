@@ -1,7 +1,10 @@
 import java.util.*;
+import java.util.concurrent.Semaphore;
 
 class Main {
     public static void main(String[] args) {
+        Semaphore mutex1 = new Semaphore(1);
+        Semaphore mutex2 = new Semaphore(1);
 
         Scanner sc = new Scanner(System.in);
         int n, c, m;
@@ -29,7 +32,7 @@ class Main {
 
             //initialize passengers
             for(int i = 0; i < n; i++) { 
-                passenger[i] = new Passenger(i, cars, doneCars);
+                passenger[i] = new Passenger(i, cars, doneCars, mutex1, mutex2);
                 passenger[i].start();
             }
 
