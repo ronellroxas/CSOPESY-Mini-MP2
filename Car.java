@@ -1,3 +1,6 @@
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
 class Car extends Thread {
 
     protected int id;
@@ -20,6 +23,7 @@ class Car extends Thread {
                         // wait for passengers to unboard
                         Thread.sleep(50);
                     }
+                    System.out.println(getTimeStamp() + ": All ashore from car " + id + ".");
 
                     break;
                 }
@@ -27,7 +31,6 @@ class Car extends Thread {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        System.out.println("Car " + id + " finished");
     }
 
     public Car(int id, int capacity) {
@@ -40,13 +43,24 @@ class Car extends Thread {
         }
     }
 
+    private String getTimeStamp() {
+        LocalDateTime dateTime = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+        return dateTime.format(formatter);
+    }
+
     public int carId() {
         return id;
     }
 
     public void setStatus(String status) {
         this.status = status;
-        System.out.println("Car " + id + " is " + status + "ing.");
+        if (status.equalsIgnoreCase("run")) {
+            System.out.println(getTimeStamp() + ": All aboard car " + id + ".");
+            System.out.println(getTimeStamp() + ": Car " + id + " is " + status + "ning.");
+        } else {
+            System.out.println(getTimeStamp() + ": Car " + id + " is " + status + "ing.");
+        }
     }
 
     public String getStatus() {

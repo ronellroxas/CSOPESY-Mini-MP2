@@ -1,5 +1,7 @@
 import java.util.*;
 import java.util.concurrent.Semaphore;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 class Passenger extends Thread {
 
@@ -17,20 +19,17 @@ class Passenger extends Thread {
         try {
             while (true) {
                 if (riding == -1) {
-                    if(cars.peek() != null || doneCars.peek() != null) {
+                    if (cars.peek() != null || doneCars.peek() != null) {
                         wander();
                         board();
                         unboard();
-                    }
-                    else {
+                    } else {
                         break;
                     }
-                    Thread.sleep(3*1000);
+                    Thread.sleep(3 * 1000);
                 }
             }
-            System.out.println("Passenger " + id + " done.");
-        }
-        catch(Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -44,9 +43,15 @@ class Passenger extends Thread {
         this.mutex2 = mutex2;
     }
 
+    private String getTimeStamp() {
+        LocalDateTime dateTime = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+        return dateTime.format(formatter);
+    }
+
     private void wander() {
         try {
-            System.out.println("Passenger " + id + " is wandering.");
+            System.out.println(getTimeStamp() + ": Passenger " + id + " is wandering.");
             Thread.sleep((rand.nextInt(10) + 2) * 1000);
         } catch (Exception e) {
             e.printStackTrace();
@@ -63,7 +68,7 @@ class Passenger extends Thread {
             if (car != null && car.getStatus().equalsIgnoreCase("load") && car.notFull()) {
                 riding = car.carId();
                 car.loadPassenger();
-                System.out.println("Passenger " + id + " boarded Car " + riding + ".");
+                System.out.println(getTimeStamp() + ": Passenger " + id + " boarded Car " + riding + ".");
 
                 if (!car.notFull()) {
                     Thread.sleep(1 * 1000); // sync to Car run
@@ -74,11 +79,14 @@ class Passenger extends Thread {
             }
             mutex1.release();
 
-            while(riding != -1 && (doneCars.peek() == null || doneCars.peek().carId() != riding)) {    //waiting for last passenger to move car to donecars
+            while (riding != -1 && (doneCars.peek() == null || doneCars.peek().carId() != riding)) { // waiting for last
+                                                                                                     // passenger to
+                                                                                                     // move car to
+                                                                                                     // donecars
                 Thread.sleep(50);
 
-                //for program end
-                if(doneCars.peek() == null && cars.peek() == null) {
+                // for program end
+                if (doneCars.peek() == null && cars.peek() == null) {
                     break;
                 }
             }
@@ -102,7 +110,8 @@ class Passenger extends Thread {
 
                     if (car.carId() == riding) {
                         car.unloadPassenger();
-                        System.out.println("Passenger " + id + " unboarded Car " + car.carId() + ".");
+                        System.out
+                                .println(getTimeStamp() + ": Passenger " + id + " unboarded Car " + car.carId() + ".");
                         riding = -1;
 
                         if (doneCars.peek() != null && car.getPassenger() == 0) {
@@ -111,8 +120,8 @@ class Passenger extends Thread {
                         break;
                     }
                 }
-                //for program end
-                if(car == null && cars.peek() == null) {
+                // for program end
+                if (car == null && cars.peek() == null) {
                     break;
                 }
             }
