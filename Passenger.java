@@ -22,7 +22,7 @@ class Passenger extends Thread {
                     if (cars.peek() != null || doneCars.peek() != null) {
                         wander();
                         board();
-                        Thread.sleep(10 * 1000);
+                        Thread.sleep(5 * 1000);
                         unboard();
                     } else {
                         break;
@@ -108,10 +108,11 @@ class Passenger extends Thread {
                     while (!car.getStatus().equalsIgnoreCase("unload")) {
                         Thread.sleep(1000);
                     }
-                    
+
                     if (car.carId() == riding) {
                         car.unloadPassenger();
-                        System.out.println(getTimeStamp() + ": Passenger " + id + " unboarded Car " + car.carId() + ".");
+                        System.out
+                                .println(getTimeStamp() + ": Passenger " + id + " unboarded Car " + car.carId() + ".");
                         riding = -1;
 
                         if (doneCars.peek() != null && car.getPassenger() == 0) {
