@@ -22,6 +22,7 @@ class Passenger extends Thread {
                     if (cars.peek() != null || doneCars.peek() != null) {
                         wander();
                         board();
+                        Thread.sleep(10 * 1000);
                         unboard();
                     } else {
                         break;
@@ -83,7 +84,7 @@ class Passenger extends Thread {
                                                                                                      // passenger to
                                                                                                      // move car to
                                                                                                      // donecars
-                Thread.sleep(50);
+                Thread.sleep(1000);
 
                 // for program end
                 if (doneCars.peek() == null && cars.peek() == null) {
@@ -97,35 +98,35 @@ class Passenger extends Thread {
 
     private void unboard() {
         try {
-
-            mutex2.acquire();
+            mutex2.tryAcquire();
             while (true) {
                 Thread.sleep(1000);
+
                 Car car = doneCars.peek();
                 if (car != null && riding == car.carId()) {
 
                     while (!car.getStatus().equalsIgnoreCase("unload")) {
                         Thread.sleep(1000);
                     }
-
+                    
                     if (car.carId() == riding) {
                         car.unloadPassenger();
-                        System.out
-                                .println(getTimeStamp() + ": Passenger " + id + " unboarded Car " + car.carId() + ".");
+                        System.out.println(getTimeStamp() + ": Passenger " + id + " unboarded Car " + car.carId() + ".");
                         riding = -1;
 
                         if (doneCars.peek() != null && car.getPassenger() == 0) {
                             doneCars.remove();
                         }
+                        mutex2.release();
                         break;
                     }
                 }
                 // for program end
                 if (car == null && cars.peek() == null) {
+                    mutex2.release();
                     break;
                 }
             }
-            mutex2.release();
         } catch (Exception e) {
             e.printStackTrace();
         }

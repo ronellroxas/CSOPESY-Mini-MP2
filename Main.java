@@ -23,7 +23,7 @@ class Main {
         Queue<Car> doneCars = new LinkedList<Car>();
         Passenger[] passenger = new Passenger[n];
 
-        if (c < n) {
+        if (c <= n) {
             // initialize cars and run kachow
             for (int i = 0; i < m; i++) {
                 Car car = new Car(i, c);
